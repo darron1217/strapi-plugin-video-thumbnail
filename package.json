@@ -1,13 +1,16 @@
 {
   "name": "strapi-plugin-video-thumbnail",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Video thumbnail plugin for Strapi",
   "strapi": {
     "name": "Video Thumbnail",
     "icon": "plug",
     "description": "Video thumbnail plugin for Strapi"
   },
-  "dependencies": {},
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.2",
+    "strapi-plugin-upload": "^3.4.4"
+  },
   "author": {
     "name": "A Strapi developer",
     "email": "",
