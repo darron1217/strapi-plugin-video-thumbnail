@@ -15,7 +15,6 @@ const ffmpeg = require('fluent-ffmpeg');
 
 module.exports = {
   async generateThumbnail(videoData) {
-    console.log(videoData);
     if (videoData.provider !== 'local') {
       // This plugin currently supports local provider only
       return;
