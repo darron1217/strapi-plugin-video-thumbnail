@@ -4,7 +4,13 @@ Add video thumbnail functionality to Strapi upload plugin.
 
 # Install
 ```
-npm install darron1217/strapi-plugin-video-thumbnail
+npm install strapi-plugin-video-thumbnail
+```
+
+or
+
+```
+yarn add strapi-plugin-video-thumbnail
 ```
 
 # Supported Providers
