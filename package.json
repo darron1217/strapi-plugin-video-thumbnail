@@ -1,19 +1,23 @@
 {
   "name": "strapi-plugin-video-thumbnail",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Video thumbnail plugin for Strapi",
   "strapi": {
     "name": "Video Thumbnail",
     "icon": "plug",
     "description": "Video thumbnail plugin for Strapi"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:darron1217/strapi-plugin-video-thumbnail.git"
+  },
   "dependencies": {
     "fluent-ffmpeg": "^2.1.2",
     "strapi-plugin-upload": "^3.4.4"
   },
   "author": {
-    "name": "A Strapi developer",
-    "email": "",
+    "name": "Darron Park",
+    "email": "darron1217@gmail.com",
     "url": ""
   },
   "maintainers": [
