@@ -17,7 +17,7 @@ module.exports = () => {
       }
 
       // Run if file type is video
-      if(data.ext.startsWith('video')) {
+      if(data.mime.startsWith('video')) {
         await generateThumbnail(data);
       }
     },
