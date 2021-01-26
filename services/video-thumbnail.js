@@ -62,7 +62,7 @@ module.exports = {
 };
 
 const getScreenshot = (videoData) =>
-  new Promise(async (resolve, reject) => {
+  new Promise((resolve, reject) => {
     // Get video path
     const configPublicPath = strapi.config.get(
       'middleware.settings.public.path',
