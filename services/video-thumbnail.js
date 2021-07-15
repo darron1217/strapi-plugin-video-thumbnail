@@ -6,7 +6,8 @@
  * @description: A set of functions similar to controller's actions to avoid code duplication.
  */
 
-const fs = require('fs');
+ const http = require('https');
+ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const os = require('os');
@@ -15,10 +16,6 @@ const ffmpeg = require('fluent-ffmpeg');
 
 module.exports = {
   async generateThumbnail(videoData) {
-    if (videoData.provider !== 'local') {
-      // This plugin currently supports local provider only
-      return;
-    }
 
     const screenshotData = await getScreenshot(videoData);
 
@@ -69,10 +66,7 @@ const getScreenshot = (videoData) =>
       strapi.config.paths.static,
     );
     const publicPath = path.resolve(strapi.dir, configPublicPath);
-    const videoPath = path.join(
-      publicPath,
-      `/uploads/${videoData.hash}${videoData.ext}`,
-    );
+    var videoPath;
 
     // Create temp folder
     const tmpPath = path.join(
@@ -83,6 +77,18 @@ const getScreenshot = (videoData) =>
 
     const screenshotExt = '.png';
     const screenshotFileName = videoData.hash + screenshotExt;
+
+    if(videoData.provider !== 'local') {
+      videoPath = fs.createWriteStream(path.join(tmpPath, videoData.name));
+      const request = http.get(videoData.path, function(response) {
+        response.pipe(file);
+      });
+    } else {
+      videoPath = path.join(
+        publicPath,
+        `/uploads/${videoData.hash}${videoData.ext}`,
+      );
+    }
 
     // Take screenshot
     try {
