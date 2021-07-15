@@ -21,7 +21,7 @@ yarn add strapi-plugin-video-thumbnail
 
 # Supported Providers
 - [x] Local
-- [ ] AWS S3
+- [x] AWS S3
 
 # How does this plugin works?
 1. This plugin overrides Upload model's `beforeCreate` database lifecycle hook on [bootstrap.js](https://github.com/darron1217/strapi-plugin-video-thumbnail/blob/main/config/functions/bootstrap.js)
