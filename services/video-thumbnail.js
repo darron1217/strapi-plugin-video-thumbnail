@@ -17,6 +17,11 @@ const ffmpeg = require('fluent-ffmpeg');
 module.exports = {
   async generateThumbnail(videoData) {
 
+    if(videoData.provider !== 'local' && !videoData.url) {
+      // If the file is not local and there's no url then we can't generate a thumbnail
+      return;
+    }
+
     const screenshotData = await getScreenshot(videoData);
 
     if (screenshotData) {
@@ -58,8 +63,25 @@ module.exports = {
   },
 };
 
+async function getVideo(videoPath, savePath) {
+  return new Promise((resolve, reject) => {
+    let tempFile = fs.createWriteStream(savePath);
+    const request = http.get(videoPath, function(response) {
+      response.pipe(tempFile);
+      response.on('end', () => {
+        resolve()
+      });
+      response.on('error', (e) => {
+        console.error("Cannot download file", e)
+        reject()
+      })
+    });
+
+  })
+}
+
 const getScreenshot = (videoData) =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     // Get video path
     const configPublicPath = strapi.config.get(
       'middleware.settings.public.path',
@@ -77,12 +99,13 @@ const getScreenshot = (videoData) =>
 
     const screenshotExt = '.png';
     const screenshotFileName = videoData.hash + screenshotExt;
+    try {
 
-    if(videoData.provider !== 'local') {
-      videoPath = fs.createWriteStream(path.join(tmpPath, videoData.name));
-      const request = http.get(videoData.path, function(response) {
-        response.pipe(file);
-      });
+    if(videoData.provider !== 'local' && videoData.url) {
+      //Fetch the video and store in tmp directory
+      videoPath = path.join(tmpPath, videoData.hash + videoData.ext);
+      await getVideo(videoData.url, videoPath);
+     
     } else {
       videoPath = path.join(
         publicPath,
@@ -91,7 +114,7 @@ const getScreenshot = (videoData) =>
     }
 
     // Take screenshot
-    try {
+    
       ffmpeg(videoPath)
         .screenshots({
           count: 1,
