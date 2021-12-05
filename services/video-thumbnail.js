@@ -12,11 +12,12 @@ const crypto = require('crypto');
 const os = require('os');
 const _ = require('lodash');
 const ffmpeg = require('fluent-ffmpeg');
+const AWS = require('aws-sdk');
 
 module.exports = {
   async generateThumbnail(videoData) {
-    if (videoData.provider !== 'local') {
-      // This plugin currently supports local provider only
+    // This plugin currently supports local and s3 providers only
+    if (!['aws-s3', 'local'].includes(videoData.provider)) {
       return;
     }
 
@@ -62,17 +63,9 @@ module.exports = {
 };
 
 const getScreenshot = (videoData) =>
-  new Promise((resolve, reject) => {
-    // Get video path
-    const configPublicPath = strapi.config.get(
-      'middleware.settings.public.path',
-      strapi.config.paths.static,
-    );
-    const publicPath = path.resolve(strapi.dir, configPublicPath);
-    const videoPath = path.join(
-      publicPath,
-      `/uploads/${videoData.hash}${videoData.ext}`,
-    );
+  new Promise(async (resolve, reject) => {
+    // Saved file name
+    const videoFileName = `${videoData.hash}${videoData.ext}`;
 
     // Create temp folder
     const tmpPath = path.join(
@@ -80,6 +73,32 @@ const getScreenshot = (videoData) =>
       `strapi${crypto.randomBytes(6).toString('hex')}`,
     );
     fs.mkdirSync(tmpPath);
+
+    // Path of video file
+    let videoPath;
+
+    // Get path of video file
+    if (videoData.provider === 'aws-s3') {
+      const providerOptions = strapi.plugins.upload.config.providerOptions;
+      const S3 = new AWS.S3({
+        apiVersion: '2006-03-01',
+        region: providerOptions.region,
+        accessKeyId: providerOptions.accessKeyId,
+        secretAccessKey: providerOptions.secretAccessKey,
+      });
+      const url = S3.getSignedUrl('getObject', {
+        Bucket: providerOptions.params.Bucket,
+        Key: videoFileName,
+      });
+      videoPath = url;
+    } else if (videoData.provider === 'local') {
+      const configPublicPath = strapi.config.get(
+        'middleware.settings.public.path',
+        strapi.config.paths.static
+      );
+      const publicPath = path.resolve(strapi.dir, configPublicPath);
+      videoPath = path.join(publicPath, `/uploads/${videoFileName}`);
+    }
 
     const screenshotExt = '.png';
     const screenshotFileName = videoData.hash + screenshotExt;
